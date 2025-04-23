@@ -8,6 +8,8 @@ repositories:
   url: "https://kubernetes.github.io/cloud-provider-openstack"
 - name: cnpg
   url: "https://cloudnative-pg.github.io/charts"
+- name: fleet
+  url: "https://rancher.github.io/fleet-helm-charts/"
 
 # Default values to set for args along with dedicated keys that can be set by contributors, cli args take precedence over these.
 # In other words, unset values results in no flags passed to helm.
@@ -53,3 +55,9 @@ releases:
 - name: cnpg
   namespace: cnpg-system
   chart: cnpg/cloudnative-pg
+- name: fleet-crd
+  namespace: cattle-fleet-system
+  chart: fleet/fleet-crd
+- name: fleet
+  namespace: cattle-fleet-system
+  chart: fleet/fleet

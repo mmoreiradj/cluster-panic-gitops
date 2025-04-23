@@ -1,9 +1,10 @@
-# kind: GitRepo
-# apiVersion: fleet.cattle.io/v1alpha1
-# metadata:
-#   name: red-team-manifests
-#   namespace: app-namespace
-# spec:
-#   repo: https://github.com/mmoreiradj/cluster-panic-gitops
-#   paths:
-#   - manifests/red-team
+kind: GitRepo
+apiVersion: fleet.cattle.io/v1alpha1
+metadata:
+  name: red-team-manifests
+  namespace: app-namespace
+spec:
+  repo: https://github.com/mmoreiradj/cluster-panic-gitops
+  paths:
+  - manifests/red-team
+  
