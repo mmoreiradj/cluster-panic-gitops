@@ -1,0 +1,55 @@
+# Chart repositories used from within this state file
+#
+# Use `helm-s3` and `helm-git` and whatever Helm Downloader plugins
+# to use repositories other than the official repository or one backend by chartmuseum.
+repositories:
+# To use official "stable" charts a.k.a https://github.com/helm/charts/tree/master/stable
+- name: cpo
+  url: "https://kubernetes.github.io/cloud-provider-openstack"
+- name: cnpg
+  url: "https://cloudnative-pg.github.io/charts"
+
+# Default values to set for args along with dedicated keys that can be set by contributors, cli args take precedence over these.
+# In other words, unset values results in no flags passed to helm.
+# See the helm usage (helm SUBCOMMAND -h) for more info on default values when those flags aren't provided.
+helmDefaults:
+  # dedicated default key for helm flag --cleanup-on-fail
+  cleanupOnFail: true
+  # wait for k8s resources via --wait. (default false)
+  wait: true
+  atomic: true
+  # time in seconds to wait for any individual Kubernetes operation (like Jobs for hooks, and waits on pod/pvc/svc/deployment readiness) (default 300)
+  timeout: 600
+  # forces resource update through delete/recreate if needed (default false)
+  force: false
+  # when using helm 3.2+, automatically create release namespaces if they do not exist (default true)
+  createNamespace: true
+
+# The list of environments managed by helmfile.
+#
+# The default is `environments: {"default": {}}` which implies:
+#
+# - `{{ .Environment.Name }}` evaluates to "default"
+# - `{{ .Values }}` being empty
+environments:
+  # The "default" environment is available and used when `helmfile` is run without `--environment NAME`.
+  default:
+    missingFileHandler: Error
+    values: []
+---
+# The desired states of Helm releases.
+#
+# Helmfile runs various helm commands to converge the current state in the live cluster to the desired state defined here.
+releases:
+- name: cinder-csi
+  namespace: kube-system
+  chart: cpo/openstack-cinder-csi
+  values:
+  - csi:
+      plugin:
+        controllerPlugin:
+          nodeSelector:
+            node-role.kubernetes.io/control-plane: "true"
+- name: cnpg
+  namespace: cnpg-system
+  chart: cnpg/cloudnative-pg
