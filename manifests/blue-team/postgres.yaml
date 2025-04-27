@@ -15,4 +15,4 @@ spec:
 
   storage:
     storageClass: csi-cinder-sc-retain
-    size: 10Gi
+    size: 40Gi
