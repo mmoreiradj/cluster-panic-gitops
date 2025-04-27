@@ -7,30 +7,10 @@ metadata:
   name: nginx
 spec:
   automountServiceAccountToken: true
-  securityContext:
-    runAsUser: 1001
-    runAsNonRoot: true
-    seccompProfile:
-      type: RuntimeDefault
   containers:
   - image: nginx
     name: nginx
     resources: {}
-    securityContext:
-      capabilities:
-        drop:
-        - ALL
-      allowPrivilegeEscalation: false
-    volumeMounts:
-    - name: cache
-      mountPath: /var/cache/nginx
-    - name: run
-      mountPath: /run
-  volumes:
-  - name: cache
-    emptyDir: {}
-  - name: run
-    emptyDir: {}
   dnsPolicy: ClusterFirst
   restartPolicy: Always
 status: {}
