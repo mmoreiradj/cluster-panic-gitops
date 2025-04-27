@@ -10,6 +10,8 @@ repositories:
   url: "https://cloudnative-pg.github.io/charts"
 - name: fleet
   url: "https://rancher.github.io/fleet-helm-charts/"
+- name: kyverno
+  url: "https://kyverno.github.io/kyverno/"
 
 # Default values to set for args along with dedicated keys that can be set by contributors, cli args take precedence over these.
 # In other words, unset values results in no flags passed to helm.
@@ -61,3 +63,6 @@ releases:
 - name: fleet
   namespace: cattle-fleet-system
   chart: fleet/fleet
+- name: kyverno
+  namespace: kyverno
+  chart: kyverno/kyverno
