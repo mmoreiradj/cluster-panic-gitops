@@ -1,0 +1,12 @@
+kind: GitRepoRestriction
+apiVersion: fleet.cattle.io/v1alpha1
+metadata:
+  name: restriction
+  namespace: fleet-local
+allowedClientSecretNames: []
+allowedRepoPatterns: []
+allowedServiceAccounts: []
+allowedTargetNamespaces:
+- app-namespace
+defaultClientSecretName: ""
+defaultServiceAccount: ""

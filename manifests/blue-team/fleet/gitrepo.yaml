@@ -5,6 +5,9 @@ metadata:
   namespace: fleet-local
 spec:
   repo: https://github.com/mmoreiradj/cluster-panic-gitops
+  targetNamespace: app-namespace
   branch: main
   paths:
   - manifests/red-team
+  pollingInterval: 15s
+  deleteNamespace: true

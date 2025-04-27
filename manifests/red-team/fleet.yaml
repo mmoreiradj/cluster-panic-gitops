@@ -1,3 +1,2 @@
-namespace: app-namespace
 namespaceLabels:
   pod-security.kubernetes.io/enforce: restricted
