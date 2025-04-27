@@ -2,7 +2,7 @@ kind: GitRepo
 apiVersion: fleet.cattle.io/v1alpha1
 metadata:
   name: red-team-manifests
-  namespace: app-namespace
+  namespace: fleet-local
 spec:
   repo: https://github.com/mmoreiradj/cluster-panic-gitops
   branch: main
