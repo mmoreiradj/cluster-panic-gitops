@@ -5,6 +5,6 @@ metadata:
   namespace: app-namespace
 spec:
   repo: https://github.com/mmoreiradj/cluster-panic-gitops
+  branch: main
   paths:
   - manifests/red-team
-  
