@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: replicaset-denied
+  namespace: app-namespace
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: replicaset-denied
+  template:
+    metadata:
+      labels:
+        app: replicaset-denied
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+      tolerations:
+        - key: "node-role.kubernetes.io/control-plane"
+          operator: "Exists" 

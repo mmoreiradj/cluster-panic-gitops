@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cronjob-denied
+  namespace: app-namespace
+spec:
+  schedule: "*/5 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: cronjob-denied
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: nginx
+              image: nginx
+              command: ["echo", "Hello from cronjob"]
+          tolerations:
+            - key: "node-role.kubernetes.io/control-plane"
+              operator: "Exists"

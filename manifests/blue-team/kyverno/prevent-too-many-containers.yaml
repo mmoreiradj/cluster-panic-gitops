@@ -1,0 +1,35 @@
+# Prevent too many containers in initContainers and containers
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: prevent-too-many-containers
+  annotations:
+    policies.kyverno.io/title: Prevent Too Many Containers
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Deployment, StatefulSet
+    policies.kyverno.io/description: >-
+      This policy prevents having too many containers in a single pod.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: prevent-too-many-containers
+      match:
+        resources:
+          kinds:
+            - Deployment
+            - StatefulSet
+          namespaces:
+            - app-namespace
+      validate:
+        message: "Too many containers in a single pod"
+        deny:
+          conditions:
+            - key: "{{ length(request.object.spec.template.spec.containers || []) }}"
+              operator: "GreaterThan"
+              value: 3
+            - key: "{{ length(request.object.spec.template.spec.initContainers || []) }}"
+              operator: "GreaterThan"
+              value: 2

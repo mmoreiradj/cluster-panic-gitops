@@ -1,0 +1,19 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cronjob-allowed
+  namespace: app-namespace
+spec:
+  schedule: "*/5 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: cronjob-allowed
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: nginx
+              image: nginx
+              command: ["echo", "Hello from cronjob"]

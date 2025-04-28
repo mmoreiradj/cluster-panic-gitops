@@ -1,0 +1,32 @@
+---
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: prevent-empty-dir-tests
+policies:
+  - ../manifests/blue-team/kyverno/prevent-empty-dir.yaml
+resources:
+  - fixtures/prevent-empty-dir/deployment-allowed.yaml
+  - fixtures/prevent-empty-dir/deployment-denied.yaml
+  - fixtures/prevent-empty-dir/statefulset-allowed.yaml
+  - fixtures/prevent-empty-dir/statefulset-denied.yaml
+results:
+  # Deployment
+  - policy: prevent-empty-dir
+    rule: prevent-empty-dir
+    resource: app-namespace/deployment-allowed
+    result: pass
+  - policy: prevent-empty-dir
+    rule: prevent-empty-dir
+    resource: app-namespace/deployment-denied
+    result: fail
+    
+  # StatefulSet
+  - policy: prevent-empty-dir
+    rule: prevent-empty-dir
+    resource: app-namespace/statefulset-allowed
+    result: pass
+  - policy: prevent-empty-dir
+    rule: prevent-empty-dir
+    resource: app-namespace/statefulset-denied
+    result: fail 

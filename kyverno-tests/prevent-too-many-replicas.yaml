@@ -1,0 +1,33 @@
+
+---
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: prevent-too-many-replicas-tests
+policies:
+  - ../manifests/blue-team/kyverno/prevent-too-many-replicas.yaml
+resources:
+  - fixtures/prevent-too-many-replicas/deployment-allowed.yaml
+  - fixtures/prevent-too-many-replicas/deployment-denied.yaml
+  - fixtures/prevent-too-many-replicas/statefulset-allowed.yaml
+  - fixtures/prevent-too-many-replicas/statefulset-denied.yaml
+results:
+  # Deployment
+  - policy: prevent-too-many-replicas
+    rule: prevent-too-many-replicas
+    resource: app-namespace/deployment-allowed
+    result: pass
+  - policy: prevent-too-many-replicas
+    rule: prevent-too-many-replicas
+    resource: app-namespace/deployment-denied
+    result: fail
+
+  # StatefulSet
+  - policy: prevent-too-many-replicas
+    rule: prevent-too-many-replicas
+    resource: app-namespace/statefulset-allowed
+    result: pass
+  - policy: prevent-too-many-replicas
+    rule: prevent-too-many-replicas
+    resource: app-namespace/statefulset-denied
+    result: fail

@@ -1,0 +1,21 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-denied
+  namespace: app-namespace
+spec:
+  completions: 1
+  parallelism: 1
+  template:
+    metadata:
+      labels:
+        app: job-denied
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: nginx
+          image: nginx
+          command: ["echo", "Hello from job"]
+      tolerations:
+        - key: "node-role.kubernetes.io/control-plane"
+          operator: "Exists" 

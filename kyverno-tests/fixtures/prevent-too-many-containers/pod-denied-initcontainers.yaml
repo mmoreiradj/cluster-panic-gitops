@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-denied-initcontainers
+  namespace: app-namespace
+spec:
+  containers:
+    - name: nginx1
+      image: nginx
+  initContainers:
+    - name: init1
+      image: alpine
+    - name: init2
+      image: alpine
+    - name: init3
+      image: alpine 

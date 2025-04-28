@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: statefulset-allowed
+  namespace: app-namespace
+spec:
+  serviceName: statefulset-allowed
+  selector:
+    matchLabels:
+      app: statefulset-allowed
+  template:
+    metadata:
+      labels:
+        app: statefulset-allowed
+    spec:
+      containers:
+        - name: nginx
+          image: nginx

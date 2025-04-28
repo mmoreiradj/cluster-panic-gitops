@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: replicaset-allowed
+  namespace: app-namespace
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: replicaset-allowed
+  template:
+    metadata:
+      labels:
+        app: replicaset-allowed
+    spec:
+      containers:
+        - name: nginx
+          image: nginx 

@@ -1,0 +1,32 @@
+---
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: prevent-too-many-containers-tests
+policies:
+  - ../manifests/blue-team/kyverno/prevent-too-many-containers.yaml
+resources:
+  - fixtures/prevent-too-many-containers/deployment-allowed.yaml
+  - fixtures/prevent-too-many-containers/deployment-denied.yaml
+  - fixtures/prevent-too-many-containers/statefulset-allowed.yaml
+  - fixtures/prevent-too-many-containers/statefulset-denied.yaml
+results:
+  # Deployment
+  - policy: prevent-too-many-containers
+    rule: prevent-too-many-containers
+    resource: app-namespace/deployment-allowed
+    result: pass
+  - policy: prevent-too-many-containers
+    rule: prevent-too-many-containers
+    resource: app-namespace/deployment-denied
+    result: fail
+    
+  # StatefulSet
+  - policy: prevent-too-many-containers
+    rule: prevent-too-many-containers
+    resource: app-namespace/statefulset-allowed
+    result: pass
+  - policy: prevent-too-many-containers
+    rule: prevent-too-many-containers
+    resource: app-namespace/statefulset-denied
+    result: fail 

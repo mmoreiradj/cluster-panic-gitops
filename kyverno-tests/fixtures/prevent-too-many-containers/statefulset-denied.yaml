@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: statefulset-denied
+  namespace: app-namespace
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: statefulset-denied
+  serviceName: statefulset-denied
+  template:
+    metadata:
+      labels:
+        app: statefulset-denied
+    spec:
+      containers:
+        - name: nginx1
+          image: nginx
+        - name: nginx2
+          image: nginx
+        - name: nginx3
+          image: nginx
+        - name: nginx4
+          image: nginx 

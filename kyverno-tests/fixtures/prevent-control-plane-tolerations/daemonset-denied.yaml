@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: daemonset-denied
+  namespace: app-namespace
+spec:
+  selector:
+    matchLabels:
+      app: daemonset-denied
+  template:
+    metadata:
+      labels:
+        app: daemonset-denied
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+      tolerations:
+        - key: "node-role.kubernetes.io/control-plane"
+          operator: "Exists" 

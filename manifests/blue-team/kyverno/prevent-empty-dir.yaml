@@ -1,0 +1,32 @@
+# Prevent the use of emptyDir volumes
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: prevent-empty-dir
+  annotations:
+    policies.kyverno.io/title: Prevent EmptyDir Volumes
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Deployment, StatefulSet
+    policies.kyverno.io/description: >-
+      This policy prevents the use of emptyDir volumes in pods, which can lead to data loss.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: prevent-empty-dir
+      match:
+        resources:
+          kinds:
+            - Deployment
+            - StatefulSet
+          namespaces:
+            - app-namespace
+      validate:
+        message: "EmptyDir volumes are not allowed due to risk of data loss"
+        deny:
+          conditions:
+            - key: "{{ request.object.spec.template.spec.volumes[].emptyDir || [] }}"
+              operator: "NotEquals"
+              value: []

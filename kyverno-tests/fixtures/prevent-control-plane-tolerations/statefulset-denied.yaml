@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: statefulset-denied
+  namespace: app-namespace
+spec:
+  serviceName: statefulset-denied
+  selector:
+    matchLabels:
+      app: statefulset-denied
+  template:
+    metadata:
+      labels:
+        app: statefulset-denied
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+      tolerations:
+        - key: "node-role.kubernetes.io/control-plane"
+          operator: "Exists"

@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-denied
+  namespace: app-namespace
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: deployment-denied
+  template:
+    metadata:
+      labels:
+        app: deployment-denied
+    spec:
+      containers:
+        - name: nginx
+          image: nginx 

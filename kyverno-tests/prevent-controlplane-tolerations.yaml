@@ -1,0 +1,91 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: prevent-control-plane-tolerations-tests
+policies:
+  - ../manifests/blue-team/kyverno/prevent-control-plane-tolerations.yaml
+resources:
+  - fixtures/prevent-control-plane-tolerations/pod-allowed.yaml
+  - fixtures/prevent-control-plane-tolerations/pod-denied.yaml
+  - fixtures/prevent-control-plane-tolerations/deployment-allowed.yaml
+  - fixtures/prevent-control-plane-tolerations/deployment-denied.yaml
+  - fixtures/prevent-control-plane-tolerations/statefulset-allowed.yaml
+  - fixtures/prevent-control-plane-tolerations/statefulset-denied.yaml
+  - fixtures/prevent-control-plane-tolerations/daemonset-allowed.yaml
+  - fixtures/prevent-control-plane-tolerations/daemonset-denied.yaml
+  - fixtures/prevent-control-plane-tolerations/replicaset-allowed.yaml
+  - fixtures/prevent-control-plane-tolerations/replicaset-denied.yaml
+  - fixtures/prevent-control-plane-tolerations/job-allowed.yaml
+  - fixtures/prevent-control-plane-tolerations/job-denied.yaml
+  - fixtures/prevent-control-plane-tolerations/cronjob-allowed.yaml
+  - fixtures/prevent-control-plane-tolerations/cronjob-denied.yaml
+results:
+  # Pod
+  - policy: prevent-control-plane-tolerations
+    rule: block-control-plane-tolerations
+    resource: app-namespace/pod-allowed
+    result: pass
+  - policy: prevent-control-plane-tolerations
+    rule: block-control-plane-tolerations
+    resource: app-namespace/pod-denied
+    result: fail
+
+  # Deployment
+  - policy: prevent-control-plane-tolerations
+    rule: block-control-plane-tolerations
+    resource: app-namespace/deployment-allowed
+    result: pass
+  - policy: prevent-control-plane-tolerations
+    rule: block-control-plane-tolerations
+    resource: app-namespace/deployment-denied
+    result: fail
+
+  # StatefulSet
+  - policy: prevent-control-plane-tolerations
+    rule: block-control-plane-tolerations
+    resource: app-namespace/statefulset-allowed
+    result: pass
+  - policy: prevent-control-plane-tolerations
+    rule: block-control-plane-tolerations
+    resource: app-namespace/statefulset-denied
+    result: fail
+
+  # DaemonSet
+  - policy: prevent-control-plane-tolerations
+    rule: block-control-plane-tolerations
+    resource: app-namespace/daemonset-allowed
+    result: pass
+  - policy: prevent-control-plane-tolerations
+    rule: block-control-plane-tolerations
+    resource: app-namespace/daemonset-denied
+    result: fail
+
+  # ReplicaSet
+  - policy: prevent-control-plane-tolerations
+    rule: block-control-plane-tolerations
+    resource: app-namespace/replicaset-allowed
+    result: pass
+  - policy: prevent-control-plane-tolerations
+    rule: block-control-plane-tolerations
+    resource: app-namespace/replicaset-denied
+    result: fail
+
+  # Job
+  - policy: prevent-control-plane-tolerations
+    rule: block-control-plane-tolerations
+    resource: app-namespace/job-allowed
+    result: pass
+  - policy: prevent-control-plane-tolerations
+    rule: block-control-plane-tolerations
+    resource: app-namespace/job-denied
+    result: fail
+
+  # CronJob
+  - policy: prevent-control-plane-tolerations
+    rule: block-control-plane-tolerations
+    resource: app-namespace/cronjob-allowed
+    result: pass
+  - policy: prevent-control-plane-tolerations
+    rule: block-control-plane-tolerations
+    resource: app-namespace/cronjob-denied
+    result: fail
