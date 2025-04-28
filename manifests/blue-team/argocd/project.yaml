@@ -12,7 +12,7 @@ spec:
 
   # Allow manifests to deploy from any Git repos
   sourceRepos:
-  - 'https://github.com/mmoreiradj/cluster-panic-gitops'
+  - 'https://github.com/mmoreiradj/cluster-panic-gitops.git'
   # Only permit applications to deploy to the 'guestbook' namespace or any namespace starting with 'guestbook-' in the same cluster
   # Destination clusters can be identified by 'server', 'name', or both.
   destinations:
