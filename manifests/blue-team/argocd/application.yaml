@@ -1,0 +1,13 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: red-team-app
+spec:
+  destination:
+    namespace: app-namespace
+    server: https://kubernetes.default.svc
+  project: red-team-project
+  source:
+    path: manifests/red-team
+    repoURL: https://github.com/mmoreiradj/cluster-panic-gitops
+    targetRevision: HEAD
