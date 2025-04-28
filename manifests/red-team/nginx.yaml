@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  namespace: app-namespace
+  namespace: db-namespace
   labels:
     run: nginx
   name: nginx
