@@ -7,3 +7,4 @@ kyverno-test:
   kyverno test . -f prevent-too-many-containers.yaml
   kyverno test . -f prevent-too-many-replicas.yaml
   kyverno test . -f mutate-runtime-class.yaml
+  kyverno test . -f mutate-readonly-fs.yaml

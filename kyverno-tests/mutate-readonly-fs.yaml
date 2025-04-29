@@ -1,0 +1,52 @@
+---
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: mutate-readonly-fs-tests
+policies:
+  - ../manifests/blue-team/kyverno/mutate-readonly-fs.yaml
+resources:
+  - fixtures/mutate-readonly-fs/deployment-without-readonly.yaml
+  - fixtures/mutate-readonly-fs/deployment-with-readonly.yaml
+  - fixtures/mutate-readonly-fs/statefulset-without-readonly.yaml
+  - fixtures/mutate-readonly-fs/statefulset-with-readonly.yaml
+  - fixtures/mutate-readonly-fs/deployment-outside-namespace.yaml
+  - fixtures/mutate-readonly-fs/statefulset-outside-namespace.yaml
+results:
+  # Deployment without readonly filesystem in app-namespace - should be mutated
+  - policy: mutate-readonly-fs
+    rule: set-readonly-fs
+    resource: app-namespace/deployment-without-readonly
+    patchedResource: fixtures/mutate-readonly-fs/deployment-without-readonly-patched.yaml
+    result: pass
+    
+  # Deployment with readonly filesystem already set in app-namespace
+  - policy: mutate-readonly-fs
+    rule: set-readonly-fs
+    resource: app-namespace/deployment-with-readonly
+    result: skip
+    
+  # StatefulSet without readonly filesystem in app-namespace - should be mutated
+  - policy: mutate-readonly-fs
+    rule: set-readonly-fs
+    resource: app-namespace/statefulset-without-readonly
+    patchedResource: fixtures/mutate-readonly-fs/statefulset-without-readonly-patched.yaml
+    result: pass
+    
+  # StatefulSet with readonly filesystem already set in app-namespace
+  - policy: mutate-readonly-fs
+    rule: set-readonly-fs
+    resource: app-namespace/statefulset-with-readonly
+    result: skip
+    
+  # Deployment outside the target namespace - should be skipped
+  - policy: mutate-readonly-fs
+    rule: set-readonly-fs
+    resource: other-namespace/deployment-outside-namespace
+    result: skip
+    
+  # StatefulSet outside the target namespace - should be skipped
+  - policy: mutate-readonly-fs
+    rule: set-readonly-fs
+    resource: other-namespace/statefulset-outside-namespace
+    result: skip 
