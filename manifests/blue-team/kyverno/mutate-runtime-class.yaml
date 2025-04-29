@@ -1,0 +1,23 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: mutate-runtime-class
+  annotations:
+    policies.kyverno.io/title: Mutate RuntimeClass
+    policies.kyverno.io/description: Automatically sets the runtimeClassName to kata-qemu for Deployments and StatefulSets
+spec:
+  rules:
+    - name: set-kata-qemu-runtime-class
+      match:
+        resources:
+          kinds:
+            - Deployment
+            - StatefulSet
+          namespaces:
+            - app-namespace
+      mutate:
+        patchStrategicMerge:
+          spec:
+            template:
+              spec:
+                runtimeClassName: kata-qemu

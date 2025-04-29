@@ -1,0 +1,52 @@
+---
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: mutate-runtime-class-tests
+policies:
+  - ../manifests/blue-team/kyverno/mutate-runtime-class.yaml
+resources:
+  - fixtures/mutate-runtime-class/deployment-without-runtime.yaml
+  - fixtures/mutate-runtime-class/deployment-with-runtime.yaml
+  - fixtures/mutate-runtime-class/statefulset-without-runtime.yaml
+  - fixtures/mutate-runtime-class/statefulset-with-runtime.yaml
+  - fixtures/mutate-runtime-class/deployment-outside-namespace.yaml
+  - fixtures/mutate-runtime-class/statefulset-outside-namespace.yaml
+results:
+  # Deployment without runtime class in app-namespace - should be mutated
+  - policy: mutate-runtime-class
+    rule: set-kata-qemu-runtime-class
+    resource: app-namespace/deployment-without-runtime
+    patchedResource: fixtures/mutate-runtime-class/deployment-without-runtime-patched.yaml
+    result: pass
+    
+  # Deployment with runtime class already set in app-namespace
+  - policy: mutate-runtime-class
+    rule: set-kata-qemu-runtime-class
+    resource: app-namespace/deployment-with-runtime
+    result: skip
+    
+  # StatefulSet without runtime class in app-namespace - should be mutated
+  - policy: mutate-runtime-class
+    rule: set-kata-qemu-runtime-class
+    resource: app-namespace/statefulset-without-runtime
+    patchedResource: fixtures/mutate-runtime-class/statefulset-without-runtime-patched.yaml
+    result: pass
+    
+  # StatefulSet with runtime class already set in app-namespace
+  - policy: mutate-runtime-class
+    rule: set-kata-qemu-runtime-class
+    resource: app-namespace/statefulset-with-runtime
+    result: skip
+    
+  # Deployment outside the target namespace - should be skipped
+  - policy: mutate-runtime-class
+    rule: set-kata-qemu-runtime-class
+    resource: other-namespace/deployment-outside-namespace
+    result: skip
+    
+  # StatefulSet outside the target namespace - should be skipped
+  - policy: mutate-runtime-class
+    rule: set-kata-qemu-runtime-class
+    resource: other-namespace/statefulset-outside-namespace
+    result: skip
