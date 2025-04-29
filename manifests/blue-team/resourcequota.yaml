@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: strict-quota
+  namespace: app-namespace
+spec:
+  hard:
+    pods: "5" # Max 3 pods autorisés
+    requests.cpu: "250m" # 0.25 CPU total demandé
+    requests.memory: "384Mi" # 384Mi mémoire demandée max
+    limits.cpu: "500m" # 0.5 CPU total limite
+    limits.memory: "512Mi" # 512Mi mémoire limite totale
+    persistentvolumeclaims: "2" # Aucune PVC autorisée
