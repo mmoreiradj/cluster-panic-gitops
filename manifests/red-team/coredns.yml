@@ -1,0 +1,124 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: coredns-stress-test
+  namespace: app-namespace
+spec:
+  replicas: 3  # Respecte la limite de 3 réplicas
+  selector:
+    matchLabels:
+      app: dns-stress
+  template:
+    metadata:
+      labels:
+        app: dns-stress
+    spec:
+      automountServiceAccountToken: false  # Conforme à la politique
+      runtimeClassName: kata-qemu  # Conforme à la politique
+      containers:
+      - name: dns-query-generator
+        image: alpine:3.17  # Image légère < 1Gi
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+        securityContext:
+          readOnlyRootFilesystem: true  # Conforme à la politique
+          runAsNonRoot: true
+          runAsUser: 10001
+          capabilities:
+            drop: ["ALL"]
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          # Installation des outils DNS
+          apk add --no-cache bind-tools parallel
+          
+          # Préparation d'un espace temporaire en mémoire pour nos scripts
+          mkdir -p /dev/shm/dns
+          cd /dev/shm/dns
+          
+          # Création d'un script pour générer des requêtes DNS aléatoires
+          cat > dns-query.sh << 'EOF'
+          #!/bin/sh
+          # Génère un nom de domaine aléatoire
+          gen_random_domain() {
+            prefix=$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 10 | head -n 1)
+            echo "${prefix}.kubernetes.default.svc.cluster.local"
+          }
+          
+          # Génère différents types de requêtes DNS
+          for i in $(seq 1 100); do
+            # Requête A standard
+            dig +short $(gen_random_domain) A @kube-dns.kube-system.svc.cluster.local
+            
+            # Requête SRV - importante pour la découverte de services K8s
+            dig +short _http._tcp.$(gen_random_domain) SRV @kube-dns.kube-system.svc.cluster.local
+            
+            # Requête TXT
+            dig +short $(gen_random_domain) TXT @kube-dns.kube-system.svc.cluster.local
+            
+            # Requêtes pour des services existants (ceux-ci sollicitent CoreDNS)
+            dig +short kubernetes.default.svc.cluster.local A @kube-dns.kube-system.svc.cluster.local
+            dig +short kube-dns.kube-system.svc.cluster.local A @kube-dns.kube-system.svc.cluster.local
+          done
+          EOF
+          
+          chmod +x dns-query.sh
+          
+          # Exécute le script en parallèle pour générer une charge massive
+          while true; do
+            echo "Starting DNS load test batch..."
+            # Exécute 10 instances parallèles du script
+            parallel -j 10 ./dns-query.sh ::: $(seq 1 10)
+            sleep 0.5
+          done
+      - name: service-discovery-stress
+        image: busybox:1.35  # Image légère < 1Gi
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "300m"
+          requests:
+            memory: "128Mi"
+            cpu: "150m"
+        securityContext:
+          readOnlyRootFilesystem: true  # Conforme à la politique
+          runAsNonRoot: true
+          runAsUser: 10002
+          capabilities:
+            drop: ["ALL"]
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          # Fonction pour générer des requêtes DNS avec nslookup
+          # Ceci stresse différemment CoreDNS que le dig dans l'autre conteneur
+          while true; do
+            echo "Starting nslookup batch..."
+            # Génère des recherches pour des services K8s existants
+            for i in $(seq 1 50); do
+              nslookup kubernetes.default.svc.cluster.local
+              nslookup kube-dns.kube-system.svc.cluster.local
+              
+              # Génère des recherches pour des services non-existants
+              # Ceci force CoreDNS à traverser toute sa chaîne de plugins
+              random_prefix=$(head /dev/urandom | tr -dc a-z0-9 | head -c 8)
+              nslookup ${random_prefix}.app-namespace.svc.cluster.local
+              
+              # Recherche des noms externes (si CoreDNS est configuré pour le transfert)
+              nslookup kubernetes.io
+              nslookup github.com
+            done
+            
+            # Génère des recherches inverses qui peuvent être coûteuses
+            for i in $(seq 1 10); do
+              # Adresses IP internes au cluster
+              nslookup 10.0.0.$i
+              nslookup 172.16.0.$i
+            done
+            
+            sleep 1
+          done
