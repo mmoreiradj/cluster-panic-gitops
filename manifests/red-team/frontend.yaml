@@ -59,7 +59,7 @@ spec:
             drop:
             - ALL
           allowPrivilegeEscalation: false
-        image: "docker.io/thomasmauran/kube-blindax-front:latest"
+        image: "docker.io/thomalloc/kube-blindax-front:latest"
         imagePullPolicy: Always
         ports:
         - name: http
