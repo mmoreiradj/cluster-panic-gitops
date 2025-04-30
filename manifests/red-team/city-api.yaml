@@ -1,12 +1,12 @@
 ---
-# Source: backend/templates/service.yaml
+# Source: city-api/templates/service.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: release-name-backend
+  name: release-name-city-api
   labels:
-    helm.sh/chart: backend-0.1.0
-    app.kubernetes.io/name: backend
+    helm.sh/chart: city-api-0.1.0
+    app.kubernetes.io/name: city-api
     app.kubernetes.io/instance: release-name
     app.kubernetes.io/version: "1.16.0"
     app.kubernetes.io/managed-by: Helm
@@ -18,17 +18,17 @@ spec:
     protocol: TCP
     name: http
   selector:
-    app.kubernetes.io/name: backend
+    app.kubernetes.io/name: city-api
     app.kubernetes.io/instance: release-name
 ---
-# Source: backend/templates/deployment.yaml
+# Source: city-api/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: release-name-backend
+  name: release-name-city-api
   labels:
-    helm.sh/chart: backend-0.1.0
-    app.kubernetes.io/name: backend
+    helm.sh/chart: city-api-0.1.0
+    app.kubernetes.io/name: city-api
     app.kubernetes.io/instance: release-name
     app.kubernetes.io/version: "1.16.0"
     app.kubernetes.io/managed-by: Helm
@@ -36,13 +36,13 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: backend
+      app.kubernetes.io/name: city-api
       app.kubernetes.io/instance: release-name
   template:
     metadata:
       labels:
-        helm.sh/chart: backend-0.1.0
-        app.kubernetes.io/name: backend
+        helm.sh/chart: city-api-0.1.0
+        app.kubernetes.io/name: city-api
         app.kubernetes.io/instance: release-name
         app.kubernetes.io/version: "1.16.0"
         app.kubernetes.io/managed-by: Helm
@@ -55,7 +55,7 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       containers:
-      - name: backend
+      - name: city-api
         securityContext:
           capabilities:
             drop:
