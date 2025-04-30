@@ -78,13 +78,13 @@ spec:
         - name: CITY_API_ADDR
           value: "127.0.0.1"
         - name: CITY_API_PORT
-          value: "2022"
+          value: "80"
         - name: CITY_API_DB_URL
-          value: "postgres://postgres:postgres@localhost:5432/city_api?sslmode=disable"
+          value: "postgres://app:app@postgres-rw.db-namespace.svc.cluster.local:5432/city_api?sslmode=disable"
         - name: CITY_API_DB_USER
-          value: "postgres"
+          value: "app"
         - name: CITY_API_DB_PWD
-          value: "1234"
+          value: "app"
         - name: PORT
           value: "80"
 ---
