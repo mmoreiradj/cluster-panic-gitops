@@ -58,7 +58,7 @@ spec:
             fi
           done
       - name: log-generator
-        image: busybox:1.35  # Image légère < 1Gi
+        image: quay.io/prometheus/busybox:latest 
         resources:
           limits:
             memory: "256Mi"
