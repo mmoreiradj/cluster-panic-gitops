@@ -3,7 +3,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: release-name-backend
+  name: backend
   labels:
     helm.sh/chart: backend-0.1.0
     app.kubernetes.io/name: backend
@@ -25,7 +25,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: release-name-backend
+  name: backend
   labels:
     helm.sh/chart: backend-0.1.0
     app.kubernetes.io/name: backend
