@@ -1,22 +1,12 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: deny-all
+  name: allow-egress-to-db-namespace
   namespace: app-namespace
 spec:
   podSelector: {}
   policyTypes:
   - Ingress
-  - Egress
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: allow-dns
-  namespace: app-namespace
-spec:
-  podSelector: {}
-  policyTypes:
   - Egress
   egress:
   - ports:
@@ -24,18 +14,7 @@ spec:
       port: 53
     - protocol: TCP
       port: 53
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: allow-egress-to-db-namespace
-  namespace: app-namespace
-spec:
-  podSelector: {}
-  policyTypes:
-  - Egress
-  egress:
   - to:
     - namespaceSelector:
         matchLabels:
-          name: db-namespace
+          kubernetes.io/metadata.name: db-namespace
