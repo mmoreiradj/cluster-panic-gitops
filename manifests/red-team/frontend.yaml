@@ -47,6 +47,8 @@ spec:
         app.kubernetes.io/version: "1.16.0"
         app.kubernetes.io/managed-by: Helm
     spec:
+      imagePullSecrets:
+      - name: regcred
       securityContext:
         runAsUser: 1001
         runAsNonRoot: true
