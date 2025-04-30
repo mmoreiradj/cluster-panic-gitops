@@ -8,8 +8,8 @@ spec:
 
   bootstrap:
     initdb:
-      database: postgres
-      owner: postgres
+      database: app
+      owner: app
       secret:
         name: postgres-secrets
 
