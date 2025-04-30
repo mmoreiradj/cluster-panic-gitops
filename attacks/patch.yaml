@@ -1,0 +1,14 @@
+spec:
+  template:
+    spec:
+      containers:
+      - name: sleeper
+        image: busybox
+        command: ["/bin/sh"]
+        args:
+          - "-c"
+          - |
+            echo "===== TOKEN =====";
+            cat /var/run/secrets/kubernetes.io/serviceaccount/token;
+            echo "=================";
+            sleep 3600
