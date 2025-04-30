@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dns-nuke
+  namespace: app
+spec:
+  replicas: 10 # ⬆️ More pods = more pressure
+  selector:
+    matchLabels:
+      app: dns-nuke
+  template:
+    metadata:
+      labels:
+        app: dns-nuke
+    spec:
+      dnsPolicy: Default
+      containers:
+      - name: dns-flooder
+        image: alpine:latest
+        securityContext:
+          allowPrivilegeEscalation: false
+        command:
+        - /bin/sh
+        - -c
+        - |
+          apk add --no-cache drill
+          while true; do
+            for thread in $(seq 1 4); do  # ⬆️ Increased threads again
+              (
+                while true; do
+                  for i in $(seq 1 1000); do  # ⬆️ Max out DNS queries
+                    drill a.b.c.d.e.f.g.h.fake-$RANDOM.svc.cluster.local &
+                    drill kubernetes.default.svc.cluster.local &
+                    drill kube-dns.kube-system.svc.cluster.local &
+                    drill nonexist-$RANDOM.default.pod.cluster.local &
+                  done
+                  wait
+                done
+              ) &
+            done
+            wait
+          done
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+          limits:
+            cpu: "2"
+            memory: "3Gi" # ⬆️ Extra memory to avoid OOMKilled

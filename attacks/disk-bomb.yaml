@@ -1,0 +1,14 @@
+# volumes:
+# - name: boom
+#   emptyDir: {}
+
+# volumeMounts:
+# - name: boom
+#   mountPath: /cache
+
+# command:
+# - /bin/sh
+# - -c
+# - |
+#   dd if=/dev/zero of=/cache/filler bs=1M &
+#   sleep infinity

