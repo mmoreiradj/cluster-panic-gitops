@@ -18,7 +18,13 @@ spec:
     command:
     - sleep
     - infinity
-    resources: {}
+    resources:
+      limits:
+        cpu: 100m
+        memory: 128Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
     securityContext:
       capabilities:
         drop:
