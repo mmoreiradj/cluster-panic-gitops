@@ -47,10 +47,18 @@ spec:
         app.kubernetes.io/version: "1.16.0"
         app.kubernetes.io/managed-by: Helm
     spec:
-      securityContext: {}
+      securityContext:
+        runAsUser: 1001
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: backend
-        securityContext: {}
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+          allowPrivilegeEscalation: false
         image: "docker.io/thomasmauran/kube-blindax-backend:latest"
         imagePullPolicy: Always
         ports:
