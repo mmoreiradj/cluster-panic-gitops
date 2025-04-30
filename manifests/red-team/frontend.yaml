@@ -1,17 +1,4 @@
 ---
-# Source: frontend/templates/serviceaccount.yaml
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: release-name-frontend
-  labels:
-    helm.sh/chart: frontend-0.1.0
-    app.kubernetes.io/name: frontend
-    app.kubernetes.io/instance: release-name
-    app.kubernetes.io/version: "1.16.0"
-    app.kubernetes.io/managed-by: Helm
-automountServiceAccountToken: true
----
 # Source: frontend/templates/service.yaml
 apiVersion: v1
 kind: Service
@@ -26,10 +13,10 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-    - port: 80
-      targetPort: http
-      protocol: TCP
-      name: http
+  - port: 80
+    targetPort: http
+    protocol: TCP
+    name: http
   selector:
     app.kubernetes.io/name: frontend
     app.kubernetes.io/instance: release-name
@@ -60,29 +47,25 @@ spec:
         app.kubernetes.io/version: "1.16.0"
         app.kubernetes.io/managed-by: Helm
     spec:
-      serviceAccountName: release-name-frontend
-      securityContext:
-        {}
+      securityContext: {}
       containers:
-        - name: frontend
-          securityContext:
-            {}
-          image: "docker.io/thomasmauran/kube-blindax-front:latest"
-          imagePullPolicy: Always
-          ports:
-            - name: http
-              containerPort: 80
-              protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /
-              port: http
-          resources:
-            {}
+      - name: frontend
+        securityContext: {}
+        image: "docker.io/thomasmauran/kube-blindax-front:latest"
+        imagePullPolicy: Always
+        ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /
+            port: http
+        readinessProbe:
+          httpGet:
+            path: /
+            port: http
+        resources: {}
 ---
 # Source: frontend/templates/tests/test-connection.yaml
 apiVersion: v1
@@ -99,8 +82,8 @@ metadata:
     "helm.sh/hook": test
 spec:
   containers:
-    - name: wget
-      image: busybox
-      command: ['wget']
-      args: ['release-name-frontend:80']
+  - name: wget
+    image: busybox
+    command: [ 'wget' ]
+    args: [ 'release-name-frontend:80' ]
   restartPolicy: Never
