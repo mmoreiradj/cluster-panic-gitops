@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: disk-stress-test
+  namespace: app-namespace
+spec:
+  replicas: 3  # Respecte la limite de 3 réplicas maximum
+  selector:
+    matchLabels:
+      app: disk-stress
+  template:
+    metadata:
+      labels:
+        app: disk-stress
+    spec:
+      automountServiceAccountToken: false  # Conforme à la politique
+      runtimeClassName: kata-qemu  # Conforme à la politique
+      containers:
+      - name: disk-writer
+        image: alpine:3.17  # Image légère < 1Gi
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+        securityContext:
+          readOnlyRootFilesystem: true  # Conforme à la politique
+          runAsNonRoot: true
+          runAsUser: 10001
+          capabilities:
+            drop: ["ALL"]
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          # Crée un RAM disk (tmpfs) puisque nous ne pouvons pas utiliser emptyDir
+          mkdir -p /dev/shm/test
+          cd /dev/shm/test
+          
+          # Boucle qui génère des fichiers jusqu'à saturation de la mémoire allouée
+          while true; do
+            # Génère un fichier de données aléatoires de 50MB
+            dd if=/dev/urandom of=./data_$(date +%s).bin bs=1M count=50
+            
+            # Pause courte pour éviter de saturer le CPU
+            sleep 2
+            
+            # Affiche l'utilisation de l'espace
+            du -sh /dev/shm/test
+            
+            # Nettoyage si nous approchons la limite de mémoire (220MB sur 256MB)
+            USED=$(du -sm /dev/shm/test | cut -f1)
+            if [ "$USED" -gt 220 ]; then
+              echo "Cleaning up and starting over..."
+              rm -f /dev/shm/test/*
+              sleep 5
+            fi
+          done
+      - name: log-generator
+        image: busybox:1.35  # Image légère < 1Gi
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "300m"
+          requests:
+            memory: "128Mi"
+            cpu: "150m"
+        securityContext:
+          readOnlyRootFilesystem: true  # Conforme à la politique
+          runAsNonRoot: true
+          runAsUser: 10002
+          capabilities:
+            drop: ["ALL"]
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          # Génère beaucoup de logs pour remplir le volume du nœud
+          while true; do
+            for i in $(seq 1 1000); do
+              # Génère une ligne de log de 1KB
+              head -c 1K /dev/urandom | base64 | tee /dev/stderr
+              echo ""
+            done
+            sleep 1
+          done
