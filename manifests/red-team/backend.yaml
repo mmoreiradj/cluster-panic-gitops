@@ -71,11 +71,11 @@ spec:
         readinessProbe: null
         resources:
           limits:
-            cpu: 10m
-            memory: 32Mi
+            cpu: 100m
+            memory: 128Mi
           requests:
-            cpu: 10m
-            memory: 32Mi
+            cpu: 100m
+            memory: 128Mi
         env:
         - name: DB_USER
           value: app
