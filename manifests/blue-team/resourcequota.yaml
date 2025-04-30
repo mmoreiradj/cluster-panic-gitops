@@ -9,10 +9,10 @@ spec:
     configmaps: "2"
     secrets: "2"
     services: "5"
-    requests.cpu: "1000m" # 5 x 200m
-    requests.memory: "1280Mi" # 5 x 256Mi
-    limits.cpu: "1000m" # 5 x 200m
-    limits.memory: "1280Mi" # 5 x 256Mi
+    requests.cpu: "2" # 5 x 200m
+    requests.memory: "1Gi" # 5 x 256Mi
+    limits.cpu: "2" # 5 x 200m
+    limits.memory: "1Gi" # 5 x 256Mi
     hugepages-2Mi: "0"
     hugepages-1Gi: "0"
     persistentvolumeclaims: "2"
