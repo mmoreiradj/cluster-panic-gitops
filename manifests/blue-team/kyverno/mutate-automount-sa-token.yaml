@@ -1,17 +1,17 @@
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
 metadata:
-  name: mutate-pod-bandwidth
+  name: mutate-automount-sa-token
   annotations:
-    policies.kyverno.io/title: Mutate Pod Bandwidth
+    policies.kyverno.io/title: Mutate Automount Service Account Token
     policies.kyverno.io/category: Security
     policies.kyverno.io/severity: High
     policies.kyverno.io/subject: Pod
     policies.kyverno.io/description: >-
-      This policy mutates Pods to set a bandwidth limit of 10MiB/s for all containers.
+      This policy mutates Pods to set automountServiceAccountToken to false for all containers.
 spec:
   rules:
-  - name: set-bandwidth-limit
+  - name: set-automount-sa-token
     match:
       resources:
         kinds:
@@ -20,7 +20,5 @@ spec:
         - app-namespace
     mutate:
       patchStrategicMerge:
-        metadata:
-          annotations:
-            kubernetes.io/egress-bandwidth: "10M"
-            kubernetes.io/ingress-bandwidth: "10M"
+        spec:
+          automountServiceAccountToken: false

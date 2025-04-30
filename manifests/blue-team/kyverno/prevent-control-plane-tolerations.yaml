@@ -7,25 +7,25 @@ spec:
   validationFailureAction: Enforce
   background: true
   rules:
-    - name: block-control-plane-tolerations
-      match:
-        resources:
-          kinds:
-            - Pod
-            - Deployment
-            - StatefulSet
-            - DaemonSet
-            - ReplicaSet
-            - Job
-            - CronJob
-          namespaces:
-            - app-namespace
-      validate:
-        message: "Tolerations for control-plane or master taints are not allowed in 'app-namespace'."
-        deny:
-          conditions:
-            - key: "{{ request.object.spec.tolerations[].key || request.object.spec.template.spec.tolerations[].key || request.object.spec.jobTemplate.spec.template.spec.tolerations[].key }}"
-              operator: AnyIn
-              value:
-                - "node-role.kubernetes.io/control-plane"
-                - "node-role.kubernetes.io/master"
+  - name: block-control-plane-tolerations
+    match:
+      resources:
+        kinds:
+        - Pod
+        - Deployment
+        - StatefulSet
+        - DaemonSet
+        - ReplicaSet
+        - Job
+        - CronJob
+        namespaces:
+        - app-namespace
+    validate:
+      message: "Tolerations for control-plane or master taints are not allowed in 'app-namespace'."
+      deny:
+        conditions:
+        - key: "{{ request.object.spec.tolerations[].key || request.object.spec.template.spec.tolerations[].key || request.object.spec.jobTemplate.spec.template.spec.tolerations[].key }}"
+          operator: AnyIn
+          value:
+          - "node-role.kubernetes.io/control-plane"
+          - "node-role.kubernetes.io/master"

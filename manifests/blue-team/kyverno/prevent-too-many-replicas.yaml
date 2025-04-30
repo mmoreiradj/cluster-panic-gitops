@@ -15,22 +15,18 @@ spec:
   validationFailureAction: Enforce
   background: true
   rules:
-    - name: prevent-too-many-replicas
-      match:
-        resources:
-          kinds:
-            - Deployment
-            - StatefulSet
-            - Pod
-          namespaces:
-            - app-namespace
-      validate:
-        message: "Too many replicas"
-        deny:
-          conditions:
-            - key: "spec.replicas"
-              operator: "GreaterThan"
-              value: "3"
-            - key: "spec.template.spec.replicas"
-              operator: "GreaterThan"
-              value: "3"
+  - name: prevent-too-many-replicas
+    match:
+      resources:
+        kinds:
+        - Deployment
+        - StatefulSet
+        namespaces:
+        - app-namespace
+    validate:
+      message: "Too many replicas"
+      deny:
+        conditions:
+        - key: "spec.replicas"
+          operator: "GreaterThan"
+          value: "3"

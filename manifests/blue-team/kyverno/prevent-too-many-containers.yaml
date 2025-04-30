@@ -15,21 +15,23 @@ spec:
   validationFailureAction: Enforce
   background: true
   rules:
-    - name: prevent-too-many-containers
-      match:
-        resources:
-          kinds:
-            - Deployment
-            - StatefulSet
-          namespaces:
-            - app-namespace
-      validate:
-        message: "Too many containers in a single pod"
-        deny:
-          conditions:
-            - key: "{{ length(request.object.spec.template.spec.containers || []) }}"
-              operator: "GreaterThan"
-              value: 3
-            - key: "{{ length(request.object.spec.template.spec.initContainers || []) }}"
-              operator: "GreaterThan"
-              value: 2
+  - name: prevent-too-many-containers
+    match:
+      resources:
+        kinds:
+        - Pod
+        namespaces:
+        - app-namespace
+    validate:
+      message: "Too many containers in a single pod"
+      deny:
+        conditions:
+        - key: "{{ length(request.object.spec.containers || []) }}"
+          operator: "GreaterThan"
+          value: 2
+        - key: "{{ length(request.object.spec.initContainers || []) }}"
+          operator: "GreaterThan"
+          value: 2
+        - key: "{{ length(request.object.spec.ephemeralContainers || []) }}"
+          operator: "GreaterThan"
+          value: 2

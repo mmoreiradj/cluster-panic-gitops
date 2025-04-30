@@ -15,18 +15,17 @@ spec:
   validationFailureAction: Enforce
   background: true
   rules:
-    - name: prevent-empty-dir
-      match:
-        resources:
-          kinds:
-            - Deployment
-            - StatefulSet
-          namespaces:
-            - app-namespace
-      validate:
-        message: "EmptyDir volumes are not allowed due to risk of data loss"
-        deny:
-          conditions:
-            - key: "{{ request.object.spec.template.spec.volumes[].emptyDir || [] }}"
-              operator: "NotEquals"
-              value: []
+  - name: prevent-empty-dir
+    match:
+      resources:
+        kinds:
+        - Pod
+        namespaces:
+        - app-namespace
+    validate:
+      message: "EmptyDir volumes are not allowed due to risk of data loss"
+      deny:
+        conditions:
+        - key: "{{ request.object.spec.volumes[].emptyDir || [] }}"
+          operator: "NotEquals"
+          value: []

@@ -11,10 +11,7 @@ metadata:
     kyverno.io/kubernetes-version: "1.23"
     policies.kyverno.io/subject: Pod
     policies.kyverno.io/description: >-
-      Pods which run containers of very large image size take longer to pull
-      and require more space to store. A user may either inadvertently or purposefully
-      name an image which is unusually large to disrupt operations. This policy
-      checks the size of every container image and blocks if it is over 1 Gibibyte.
+      Pods which run containers of very large image size take longer to pull and require more space to store. A user may either inadvertently or purposefully name an image which is unusually large to disrupt operations. This policy checks the size of every container image and blocks if it is over 1 Gibibyte.
 spec:
   validationFailureAction: Enforce
   rules:
@@ -24,18 +21,20 @@ spec:
       - resources:
           kinds:
           - Pod
+          namespaces:
+          - app-namespace
     preconditions:
       all:
       - key: "{{request.operation || 'BACKGROUND'}}"
         operator: NotEquals
         value: DELETE
     validate:
-      message: "images with size greater than 1Gi not allowed"  
+      message: "images with size greater than 1Gi not allowed"
       foreach:
       - list: "request.object.spec.containers"
-        context: 
+        context:
         - name: imageSize
-          imageRegistry: 
+          imageRegistry:
             reference: "{{ element.image }}"
             # Note that we need to use `to_string` here to allow kyverno to treat it like a resource quantity of type memory
             # the total size of an image as calculated by docker is the total sum of its layer sizes
