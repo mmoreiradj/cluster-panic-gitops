@@ -12,8 +12,6 @@ spec:
 
   # Source of the application manifests
   source:
-    kustomize:
-      namespace: app-namespace
     directory:
       recurse: true
     path: manifests/red-team
