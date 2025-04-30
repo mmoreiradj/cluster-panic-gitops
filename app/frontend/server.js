@@ -3,11 +3,24 @@ const path = require('path');
 const fetch = require('node-fetch');
 const app = express();
 
+// Add startup logging
+console.log('Starting frontend server...');
+console.log('Environment:', process.env.NODE_ENV || 'development');
+console.log('Current working directory:', process.cwd());
+console.log('Server file location:', __dirname);
+
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
+console.log('Static files served from:', path.join(__dirname, 'public'));
 
 // Add JSON body parser middleware
 app.use(express.json());
+
+// Add request logging middleware
+app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    next();
+});
 
 // Proxy API requests to backend
 app.get('/api/items', async (req, res) => {
@@ -38,6 +51,7 @@ app.get('/api/items', async (req, res) => {
         res.json(data);
     } catch (error) {
         console.error('Error fetching items:', error);
+        console.error('Error stack:', error.stack);
         res.status(500).json({ 
             error: 'Failed to fetch items',
             details: error.message,
@@ -50,6 +64,7 @@ app.get('/api/items', async (req, res) => {
 app.post('/api/items', async (req, res) => {
     try {
         console.log('Adding new item to backend service...');
+        console.log('Request body:', req.body);
         const backendUrl = 'http://backend.app-namespace.svc.cluster.local/api/items';
         console.log('Backend URL:', backendUrl);
         
@@ -74,6 +89,7 @@ app.post('/api/items', async (req, res) => {
         res.json(data);
     } catch (error) {
         console.error('Error adding item:', error);
+        console.error('Error stack:', error.stack);
         res.status(500).json({ 
             error: 'Failed to add item',
             details: error.message,
@@ -225,6 +241,7 @@ app.get('/', async (req, res) => {
         res.send(html);
     } catch (error) {
         console.error('Error rendering page:', error);
+        console.error('Error stack:', error.stack);
         res.status(500).send(
             '<div class="container">' +
             '<h1>Error</h1>' +
@@ -235,8 +252,48 @@ app.get('/', async (req, res) => {
     }
 });
 
+// Add error handling middleware
+app.use((err, req, res, next) => {
+    console.error('Unhandled error:', err);
+    console.error('Error stack:', err.stack);
+    res.status(500).json({
+        error: 'Internal server error',
+        details: err.message
+    });
+});
+
+// Add process error handlers
+process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception:', err);
+    console.error('Error stack:', err.stack);
+    process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise);
+    console.error('Reason:', reason);
+});
+
 // Note: This server needs to run as root in production to bind to port 80
 const PORT = process.env.PORT || 80;
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log('Server running on port ' + PORT);
+    console.log('Server process ID:', process.pid);
+});
+
+// Add graceful shutdown handler
+process.on('SIGTERM', () => {
+    console.log('Received SIGTERM signal. Starting graceful shutdown...');
+    server.close(() => {
+        console.log('Server closed. Exiting process...');
+        process.exit(0);
+    });
+});
+
+process.on('SIGINT', () => {
+    console.log('Received SIGINT signal. Starting graceful shutdown...');
+    server.close(() => {
+        console.log('Server closed. Exiting process...');
+        process.exit(0);
+    });
 }); 
