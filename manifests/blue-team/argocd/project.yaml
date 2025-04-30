@@ -28,8 +28,6 @@ spec:
   - group: 'apps'
     kind: StatefulSet
   - group: ''
-    kind: Pod
-  - group: ''
     kind: ConfigMap
   - group: ''
     kind: Secret
