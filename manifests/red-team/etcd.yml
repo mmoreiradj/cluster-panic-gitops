@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: etcd-stress-test
+  namespace: app-namespace
+spec:
+  replicas: 3  # Respecte la limite de 3 réplicas
+  selector:
+    matchLabels:
+      app: etcd-stress
+  template:
+    metadata:
+      labels:
+        app: etcd-stress
+    spec:
+      automountServiceAccountToken: false  # Conforme à la politique
+      runtimeClassName: kata-qemu  # Conforme à la politique
+      containers:
+      - name: k8s-client
+        image: bitnami/kubectl:latest  # Image légère
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+        securityContext:
+          readOnlyRootFilesystem: true  # Conforme à la politique
+          runAsNonRoot: true
+          runAsUser: 1001
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          # Création d'un espace temporaire en mémoire
+          mkdir -p /dev/shm/workdir
+          cd /dev/shm/workdir
+          
+          # Boucle de génération de ConfigMaps
+          while true; do
+            # Génère un nom unique
+            TIMESTAMP=$(date +%s%N)
+            
+            # Crée un manifest de ConfigMap
+            cat > configmap-$TIMESTAMP.yaml << EOF
+          apiVersion: v1
+          kind: ConfigMap
+          metadata:
+            name: stress-configmap-$TIMESTAMP
+            namespace: app-namespace
+          data:
+            timestamp: "$TIMESTAMP"
+            data1: "$(head -c 10K /dev/urandom | base64)"
+            data2: "$(head -c 10K /dev/urandom | base64)"
+            data3: "$(head -c 10K /dev/urandom | base64)"
+          EOF
+            
+            # Applique la ConfigMap
+            kubectl apply -f configmap-$TIMESTAMP.yaml
+            
+            # Supprime immédiatement après création pour générer des opérations d'écriture/suppression
+            kubectl delete configmap stress-configmap-$TIMESTAMP -n app-namespace
+            
+            # Pour ne pas excéder les quotas d'API
+            sleep 0.5
+          done
+      - name: api-stress
+        image: alpine:3.17  # Image légère
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "400m"
+          requests:
+            memory: "128Mi"
+            cpu: "200m"
+        securityContext:
+          readOnlyRootFilesystem: true  # Conforme à la politique
+          runAsNonRoot: true
+          runAsUser: 1002
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          # Installation des outils nécessaires
+          apk add --no-cache curl jq
+          
+          # Boucle de requêtes LIST qui génèrent une charge de lecture sur etcd
+          while true; do
+            # Liste tous les secrets, ce qui force etcd à lire
+            curl -s -k https://kubernetes.default.svc/api/v1/namespaces/app-namespace/secrets \
+              -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
+              -o /dev/null
+            
+            # Liste tous les pods, une autre opération de lecture intensive
+            curl -s -k https://kubernetes.default.svc/api/v1/namespaces/app-namespace/pods \
+              -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
+              -o /dev/null
+            
+            # Liste les ConfigMaps
+            curl -s -k https://kubernetes.default.svc/api/v1/namespaces/app-namespace/configmaps \
+              -H "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
+              -o /dev/null
+              
+            # Pause courte
+            sleep 0.2
+          done
