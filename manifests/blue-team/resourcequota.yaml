@@ -5,9 +5,15 @@ metadata:
   namespace: app-namespace
 spec:
   hard:
-    pods: "5" # Max 3 pods autorisés
-    requests.cpu: "250m" # 0.25 CPU total demandé
-    requests.memory: "384Mi" # 384Mi mémoire demandée max
-    limits.cpu: "500m" # 0.5 CPU total limite
-    limits.memory: "512Mi" # 512Mi mémoire limite totale
-    persistentvolumeclaims: "2" # Aucune PVC autorisée
+    pods: "5"
+    configmaps: "2"
+    secrets: "2"
+    services: "5"
+    requests.cpu: "1000m" # 5 x 200m
+    requests.memory: "1280Mi" # 5 x 256Mi
+    limits.cpu: "1000m" # 5 x 200m
+    limits.memory: "1280Mi" # 5 x 256Mi
+    hugepages-2Mi: "0"
+    hugepages-1Gi: "0"
+    persistentvolumeclaims: "2"
+    replicationcontrollers: "0"
