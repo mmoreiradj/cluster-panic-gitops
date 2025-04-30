@@ -61,7 +61,7 @@ spec:
             drop:
             - ALL
           allowPrivilegeEscalation: false
-        image: "ghcr.io/thomas-mauran/city-api:sha-6d6c460"
+        image: "ghcr.io/thomas-mauran/city_api:sha-6d6c460"
         imagePullPolicy: Always
         ports:
         - name: http
