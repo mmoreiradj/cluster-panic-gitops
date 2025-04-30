@@ -6,6 +6,13 @@ metadata:
 spec:
   instances: 1
 
+  postgresql:
+    parameters:
+      max_connections: "50"
+      track_activity_query_size: "2048"
+      pg_stat_statements.max: "10000"
+      pg_stat_statements.track: "all"
+
   bootstrap:
     initdb:
       database: app
@@ -13,6 +20,16 @@ spec:
       secret:
         name: postgres-secrets
 
+  enableSuperuserAccess: false
+
   storage:
     storageClass: local-path
     size: 40Gi
+
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "1"
+    limits:
+      memory: "512Mi"
+      cpu: "1"
