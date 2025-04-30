@@ -23,7 +23,7 @@ spec:
   enableSuperuserAccess: false
 
   storage:
-    storageClass: local-path
+    storageClass: csi-cinder-sc-retain
     size: 40Gi
 
   resources:
