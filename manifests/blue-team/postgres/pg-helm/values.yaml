@@ -1,0 +1,17 @@
+# Namespace Configuration
+namespace: db-namespace
+
+# PostgreSQL Configuration
+database:
+  name: postgres
+  username: postgres
+  # Special characters in password need to be quoted
+  password: "postgres"
+
+# Cluster Configuration
+cluster:
+  name: postgres
+  instances: 1
+  storage:
+    size: 50Gi
+    storageClass: local-path

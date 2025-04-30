@@ -14,5 +14,5 @@ spec:
         name: postgres-secrets
 
   storage:
-    storageClass: csi-cinder-sc-retain
+    storageClass: local-path
     size: 40Gi
